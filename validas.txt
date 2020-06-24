@@ -1,0 +1,3 @@
+function as boolean ( var dat : string )
+
+function as ( var dat : string ; intr : integer )
