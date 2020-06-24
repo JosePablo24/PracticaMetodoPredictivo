@@ -21,12 +21,18 @@ function main() {
     var letras = new RegExp("[a-z]+")
     var contador = 0
     hay_error = false
+    pasa_var = false
+    pasa_nombre = false
+    pasa_puntos = false
+    pasa_tipo = false
+    termina = false
+    pasa_punto_coma = false
     if(name == " "){
-        console.log("Amigo sabes que tienes que meter mas datos verdad ");        
+        console.log("Amigo sabes que tienes que meter mas datos verdad ");
     }else{
         if(cadena[0] == 'function'){
             console.log('la entrada es valida')
-            stack.push('$')                                                            
+            stack.push('$')
             stack.push('PARAMETROS')
             stack.push('NOMBRE')
             stack.push('function')
@@ -38,23 +44,69 @@ function main() {
             if( hay_error == false){
                 Terminales.forEach(datas => {
                   if(stack.peek() == datas){                    
-                      //console.log('actualizar pila');
+                      console.log('actualizar pila');
                       pilaActualizar(datas, reglas, stack,cadena[contador])
                     }                                      
                 });                
-                if(reservada.test(element)){
-                  //console.log('Reservadas → ', element," Se extrae → ", stack.pop())
-                  stack.pop()
+                if(reservada.test(element)){                  
+                  if(contador == 0){
+                    console.log('Reservadas → ', element," Se extrae → ", stack.pop())
+                    //stack.pop()
+                  }
+                  if(pasa_var == true && element == 'var'){
+                    console.log('Reservadas → ', element," Se extrae → ", stack.pop())
+                    //stack.pop()
+                    pasa_nombre = true
+                    pasa_var = false
+                  }
+                  if (pasa_tipo == true) {
+                    console.log('Reservadas → ', element," Se extrae → ", stack.pop())
+                    //stack.pop()
+                    pasa_tipo = false
+                    if(cadena[contador + 1] == ')'){
+                      termina = true
+                    }else{
+                      pasa_punto_coma = true
+                    }
+                  }
                 }else if (simbolos.test(element)) {
-                  if(letras.test(element) == false){
-                    //console.log('Simbolos → ', element," Se extrae → ", stack.pop())
-                    stack.pop()
+                  if(letras.test(element) == false){                    
+                    if(contador == 2 && element == '('){
+                      console.log('Simbolos → ', element," Se extrae → ", stack.pop())
+                      //stack.pop()
+                      pasa_var = true
+                    }
+                    if (pasa_puntos == true) {
+                      console.log('Simbolos → ', element," Se extrae → ", stack.pop())
+                      //stack.pop()
+                      pasa_puntos = false
+                      pasa_tipo = true
+                    }
+                    if (pasa_punto_coma == true && element == ';') {
+                      console.log('Simbolos → ', element," Se extrae → ", stack.pop())
+                      //stack.pop()                      
+                      pasa_nombre = true
+                      pasa_punto_coma = false
+                    }
+                    if(termina == true && element ==')'){
+                      console.log('Simbolos → ', element," Se extrae → ", stack.pop())
+                      //stack.pop()
+                    }
                   }
                 }else if(letras.test(element)){
-                  if(stack.peek() != 'var'){
-                    //console.log('Variables → ', element," Se extrae → ", stack.pop())
-                    stack.pop()
-                    stack.pop()
+                  if(stack.peek() != 'var'){                    
+                    if(contador == 1){
+                      console.log('Variables → ', element," Se extrae → ", stack.pop())
+                      stack.pop()
+                      //stack.pop()
+                    }
+                    if(pasa_nombre == true){
+                      console.log('Variables → ', element," Se extrae → ", stack.pop())
+                      stack.pop()
+                      //stack.pop()
+                      pasa_nombre = false
+                      pasa_puntos = true
+                    }
                   }
                 }else{
                     console.log('Hubo algun error');
@@ -62,9 +114,7 @@ function main() {
                 }
                 stack.print()
                 contador += 1
-            }else{
-                console.log('Algo salio mal porfavor revisa')
-            }          
+            }        
         });
     }
     if(stack.peek() != '$' || hay_error == true){
@@ -84,8 +134,7 @@ function pilaActualizar(datas, rules, stack, cadena) {
           //console.log('Se agrega → ',stack.push(element[i]))
           stack.push(element[i])
         }        
-      }
-      //stack.print()
+      }      
     }
   });
   stack.print()
